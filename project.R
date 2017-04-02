@@ -1,3 +1,5 @@
+trainData=read.csv("trainData.csv", stringsAsFactors=T)
+
 library(ModelMetrics)
 library(caret)
 #Naive Bayes: accuracy=0.802260776059903  #AUC & MCC
@@ -7,7 +9,7 @@ cv_results <- lapply(folds, function(x) {
   train <- trainData[-x, ]
   test <- trainData[x, ]
   actual=test$y
-  model1 <- naiveBayes(y ~ funded_amnt+term+int_rate+installment+sub_grade+emp_length+home_ownership+annual_inc+verification_status+purpose+addr_state+dti+inq_last_6mths+open_acc+pub_rec+revol_bal+revol_util+total_acc+initial_list_status+acc_now_delinq, data=train)
+  model1 <- naiveBayes(y ~ funded_amnt+term+sub_grade+emp_length+home_ownership+annual_inc+verification_status+purpose+addr_state+dti+inq_last_6mths+open_acc+pub_rec+revol_bal+revol_util+total_acc+initial_list_status+acc_now_delinq, data=train)
   #model1 <- naiveBayes(y ~ funded_amnt+term+int_rate+installment+sub_grade+emp_length+annual_inc+verification_status+purpose+addr_state+dti+inq_last_6mths+open_acc+pub_rec+revol_bal+revol_util+total_acc+initial_list_status+acc_now_delinq, data=train)
   test_pred <- predict(model1, test)
   res= auc(actual,test_pred) #note: this is using ModelMetrics and not pROC.
@@ -22,7 +24,7 @@ cv_results <- lapply(folds, function(x) {
   train <- trainData[-x, ]
   test <- trainData[x, ]
   actual=test$y
-  model2 <- ctree(y ~ funded_amnt+term+int_rate+installment+sub_grade+emp_length+home_ownership+annual_inc+verification_status+purpose+addr_state+dti+inq_last_6mths+open_acc+pub_rec+revol_bal+revol_util+total_acc+initial_list_status+acc_now_delinq, data=train)
+  model2 <- ctree(y ~ funded_amnt+term+sub_grade+emp_length+home_ownership+annual_inc+verification_status+purpose+addr_state+dti+inq_last_6mths+open_acc+pub_rec+revol_bal+revol_util+total_acc+initial_list_status+acc_now_delinq, data=train)
   #model2 <- ctree(y ~ funded_amnt+term+int_rate+installment+sub_grade+emp_length+annual_inc+verification_status+purpose+addr_state+dti+inq_last_6mths+open_acc+pub_rec+revol_bal+revol_util+total_acc+initial_list_status+acc_now_delinq, data=train)
   test_pred <- predict(model2, test)
   res=ModelMetrics::auc(actual,test_pred)
@@ -32,7 +34,11 @@ cv_results <- lapply(folds, function(x) {
 ctree_cv_res=str(cv_results)
 
 #Regression of amount of unpaid
-#Adjusted R2=0.8455
-trainData_b= #wait dont touch this
-model3=lm(unpaid ~ funded_amnt+term+int_rate+installment+sub_grade+emp_length+home_ownership+annual_inc+verification_status+purpose+addr_state+dti+inq_last_6mths+open_acc+pub_rec+revol_bal+revol_util+total_acc, data=trainData_b)
+train_b=trainData[trainData$y=="Bad",]
+
+#Adjusted R2=0.8389
+model3=lm(unpaid ~ funded_amnt+term+sub_grade+emp_length+home_ownership+annual_inc+verification_status+purpose+addr_state+dti+inq_last_6mths+open_acc+pub_rec+revol_bal+revol_util+total_acc, data=trainData_b)
+
+step(model3)
+# Results: drop total_acc, inq_last_6_mths, revol_bal. AIC=548203.6 (vs. initial 548207.6)
 
