@@ -42,3 +42,4 @@ model3=lm(unpaid ~ funded_amnt+term+sub_grade+emp_length+home_ownership+annual_i
 step(model3)
 # Results: drop total_acc, inq_last_6_mths, revol_bal. AIC=548203.6 (vs. initial 548207.6)
 
+#sdlkanfdnglsfnglfkdng
